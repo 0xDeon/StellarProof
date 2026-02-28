@@ -44,17 +44,13 @@ export default function Footer() {
   const { theme } = useTheme();
 
   // Define theme‑dependent classes
-  const isDark = theme === "dark";
-  const bgGradient = isDark
-    ? "from-blue-900 to-slate-900"
-    : "from-blue-50 to-slate-100";
-  const textPrimary = isDark ? "text-white" : "text-slate-900";
-  const textSecondary = isDark ? "text-slate-300" : "text-slate-600";
-  const borderColor = isDark ? "border-slate-700/50" : "border-slate-200";
-  const iconBg = isDark
-    ? "bg-blue-500/20 hover:bg-blue-500/40"
-    : "bg-blue-100 hover:bg-blue-200";
-  const iconColor = isDark ? "text-blue-400" : "text-blue-600";
+  const isDark = theme === "dark" || true; // Always use dark theme
+  const bgGradient = "from-darkblue-dark via-darkblue to-darkblue-dark";
+  const textPrimary = "text-white";
+  const textSecondary = "text-gray-300";
+  const borderColor = "border-blue-500/20";
+  const iconBg = "bg-blue-500/20 hover:bg-blue-500/40";
+  const iconColor = "text-blue-300";
 
   return (
     <footer
@@ -161,7 +157,7 @@ export default function Footer() {
         {/* Divider */}
         <div className={`border-t ${borderColor} pt-8`}>
           <p
-            className={`text-center text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}
+            className="text-center text-sm text-gray-400"
           >
             © 2026 StellarProof, Inc. All rights reserved.
           </p>

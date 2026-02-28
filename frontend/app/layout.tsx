@@ -7,9 +7,27 @@ import { WalletProvider } from "../context/WalletContext";
 import { ToastProvider } from "./context/ToastContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "StellarProof",
-  description: "The Truth Engine for the Stellar Ecosystem",
+  title: "StellarProof - The Truth Engine for Digital Content",
+  description: "Verifiable digital authenticity powered by Soroban smart contracts. Cryptographically signed verification for digital content and media ecosystems.",
+  keywords: "stellar, blockchain, verification, authenticity, soroban, smart contracts",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: "#256af4",
 };
 
 export default function RootLayout({
@@ -18,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark" data-theme="dark">
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -33,14 +51,16 @@ export default function RootLayout({
                   var isDark = stored !== 'light';
                   document.documentElement.classList.toggle('dark', isDark);
                   document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-                } catch(e) {}
+                } catch(e) {
+                  document.documentElement.classList.add('dark');
+                }
               })();
             `,
           }}
         />
       </head>
       <body
-        className="antialiased bg-white dark:bg-darkblue text-gray-900 dark:text-gray-100 transition-colors duration-300"
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-darkblue-dark text-gray-900 dark:text-gray-100 transition-colors duration-300`}
       >
         <ThemeProvider>
           <ToastProvider>
