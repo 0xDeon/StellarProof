@@ -3,15 +3,19 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/stellarproof';
-
 export const connectDB = async (): Promise<void> => {
   try {
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (!MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is not defined. Please check your .env file or request credentials.');
+    }
+
     const conn = await mongoose.connect(MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error: any) {
     console.error(`Error connecting to MongoDB: ${error.message}`);
-    // Don't exit process in dev, just log the error
-    // process.exit(1); 
+    // Exit process if unable to connect to the database
+    process.exit(1); 
   }
 };
