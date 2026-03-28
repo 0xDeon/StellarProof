@@ -1,8 +1,8 @@
 "use client";
 
-import RequestRow from "@/components/dashboard/RequestRow";
+import RequestRow, { type Request } from "@/components/dashboard/RequestRow";
 
-const mockRequest = {
+const mockRequest: Request = {
   id: "1",
   hash: "0x1234567890abcdef1234567890abcdef",
   fullHash:
@@ -27,7 +27,7 @@ export default function Page() {
   return (
     <div className="p-8 bg-gray-500 min-h-screen">
       <div className="max-w-2xl mx-auto">
-        <RequestRow request={mockRequest as any} />
+        <RequestRow request={mockRequest} />
       </div>
     </div>
   );
