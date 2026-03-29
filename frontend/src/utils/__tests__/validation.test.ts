@@ -2,7 +2,6 @@
  * Tests for SHA256 Validation Utility
  */
 
- 
 import { isValidSHA256, validateSHA256 } from '../validation';
 
 describe('SHA256 Validation Utility', () => {
@@ -87,7 +86,6 @@ describe('SHA256 Validation Utility', () => {
     test('should return appropriate error message for undefined input', () => {
       expect(validateSHA256(undefined as unknown as string)).toBe('Hash cannot be null or undefined');
     });
-
     test('should return appropriate error message for empty string', () => {
       expect(validateSHA256('')).toBe('Hash cannot be empty');
     });

@@ -10,7 +10,7 @@ import {
 import { useWallet } from "@/context/WalletContext";
 import { FREIGHTER_INSTALL_URL } from "@/services/wallet";
 import { motion, AnimatePresence } from "framer-motion";
-import { AccountDropdown } from "../src/components/wallet/AccountDropdown";
+import { AccountDropdown } from "@/components/wallet/AccountDropdown";
 
 const btnBase =
   "rounded-lg px-4 py-2.5 text-sm font-semibold w-full sm:w-auto flex justify-center items-center gap-2 transition focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-darkblue cursor-pointer disabled:opacity-70";
