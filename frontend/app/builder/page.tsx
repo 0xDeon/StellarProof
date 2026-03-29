@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from "react";
-import Header from "@/components/Header";
-import { ManifestPreview } from "@/components/manifest/ManifestPreview";
+import Header from "../../components/Header";
+import { ManifestPreview } from "../../components/manifest/ManifestPreview";
 
 /**
  * MOCK DATA: Requirement - Use mock data in service layer during development.

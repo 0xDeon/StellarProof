@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Stepper } from "@/components/ui/Stepper";
+import { Stepper } from "../../components/ui/Stepper";
 
 export default function StepperDemo() {
   const [currentStep, setCurrentStep] = useState(0);

@@ -1,14 +1,13 @@
 "use client";
 
-import React from "react";
 import { 
   Skeleton, 
   TextSkeleton, 
   CardSkeleton, 
   TableSkeleton, 
   WizardSkeleton 
-} from "@/components/ui/Skeleton";
-import Header from "@/components/Header";
+} from "../../components/ui/Skeleton";
+import Header from "../../components/Header";
 
 export default function SkeletonDemo() {
   return (

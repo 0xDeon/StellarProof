@@ -29,10 +29,18 @@ export interface ManifestData {
 
 export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }) => {
   const [format, setFormat] = useState<ManifestFormat>('json');
+  const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLPreElement>(null);
 
-  // Derive output and error in one pure step
+  // 1. Resolve Hydration & Linter Error
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { formattedOutput, error } = useMemo(() => {
     if (!manifestData || Object.keys(manifestData).length === 0) {
       return { 
@@ -63,13 +71,13 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
   }, [manifestData, format]);
 
   useEffect(() => {
-    if (!error) {
+    if (mounted && !error) {
       Prism.highlightAll();
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     }
-  }, [formattedOutput, format, error]);
+  }, [formattedOutput, format, error, mounted]);
 
   const handleCopy = async () => {
     if (error) return;
@@ -78,8 +86,12 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
     setTimeout(() => setCopied(false), 2000);
   };
 
+  if (!mounted) return null;
+
+  const langClass = format === 'json' ? 'language-json' : 'language-markup';
+
   return (
-    <div className="flex flex-col h-[500px] bg-[#0d1117] border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-[500px] bg-[#0d1117] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
       <div className="flex justify-between items-center p-3 bg-[#161b22] border-b border-gray-800">
         <div className="flex items-center gap-2">
            <div className="flex gap-1.5 px-2">
@@ -87,7 +99,10 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
              <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
              <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
            </div>
-           <span className="text-[11px] font-mono text-gray-500 italic uppercase">preview.{format}</span>
+           {/* Sharp Technical Typography */}
+           <span className="text-[10px] font-mono text-gray-400 font-bold tracking-[0.25em] uppercase leading-none">
+             preview.{format}
+           </span>
         </div>
         <div className="flex items-center gap-3">
           <FormatToggle currentFormat={format} onFormatChange={setFormat} />
@@ -97,7 +112,6 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
             className={`p-1.5 rounded-md transition-all active:scale-95 ${
               error ? 'opacity-20 cursor-not-allowed' : 'text-gray-400 hover:bg-gray-700'
             }`}
-            title="Copy to clipboard"
           >
             {copied ? <CheckIcon className="w-4 h-4 text-green-500" /> : <ClipboardDocumentIcon className="w-4 h-4" />}
           </button>
@@ -109,7 +123,6 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
           <div className="flex flex-col items-center justify-center w-full h-full p-8 text-center bg-[#0d1117]">
              <ExclamationTriangleIcon className="w-10 h-10 text-amber-500 mb-3 opacity-80" />
              <h3 className="text-gray-200 font-semibold">Preview Unavailable</h3>
-             <p className="mt-1 text-gray-500 text-xs max-w-[250px]">{error}</p>
           </div>
         ) : (
           <>
@@ -121,10 +134,10 @@ export const ManifestPreview = ({ manifestData }: { manifestData: ManifestData }
 
             <pre 
               ref={scrollRef}
-              className={`flex-1 p-4 m-0 overflow-auto custom-scrollbar language-${format === 'json' ? 'json' : 'markup'}`}
+              className={`flex-1 p-4 m-0 overflow-auto custom-scrollbar ${langClass}`}
               style={{ backgroundColor: 'transparent' }}
             >
-              <code className={`language-${format === 'json' ? 'json' : 'markup'} leading-relaxed`}>
+              <code className={`${langClass} leading-relaxed`}>
                 {formattedOutput}
               </code>
             </pre>
