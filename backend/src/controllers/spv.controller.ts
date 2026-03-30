@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import * as spvService from '../services/spv.service';
 import Asset from '../models/Asset.model';
+import User from '../models/User.model';
+import KMSKey from '../models/KMSKey.model';
 
 /**
  * SPV Controller

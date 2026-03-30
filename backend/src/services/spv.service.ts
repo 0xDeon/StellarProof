@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import KMSKey from '../models/KMSKey.model';
 import SPVRecord from '../models/SPVRecord.model';
 import Asset from '../models/Asset.model';
+import User from '../models/User.model';
 
 /**
  * SPV Service
@@ -112,8 +113,7 @@ export async function getSPVRecordByAssetId(assetId: string) {
 
   return await SPVRecord.findOne({ assetId })
     .populate('assetId')
-    .populate('creatorId', 'email username')
-    .populate('kmsKeyId', 'keyVersion algorithm isActive');
+    .populate('kmsKeyId');
 }
 
 /**
@@ -126,7 +126,7 @@ export async function getSPVRecordsByUser(userId: string) {
 
   return await SPVRecord.find({ creatorId: userId })
     .populate('assetId')
-    .populate('kmsKeyId', 'keyVersion algorithm isActive')
+    .populate('kmsKeyId')
     .sort({ createdAt: -1 });
 }
 

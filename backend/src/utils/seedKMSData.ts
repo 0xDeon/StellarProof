@@ -57,8 +57,9 @@ async function seedKMSData() {
     // Create a test user
     const testUser = new User({
       email: 'test@stellarproof.com',
-      password: 'hashedpassword123', // In real app, this would be bcrypt hashed
-      stellarPublicKey: null
+      passwordHash: 'hashedpassword123', // In real app, this would be bcrypt hashed
+      stellarPublicKey: null,
+      role: 'creator'
     });
 
     await testUser.save();
