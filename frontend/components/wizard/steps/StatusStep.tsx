@@ -58,10 +58,12 @@ interface Particle {
   id: number;
   x: number;
   y: number;
+  xOffset: number;
   angle: number;
   color: string;
   size: number;
   duration: number;
+  isCircle: boolean;
 }
 
 const CONFETTI_COLORS = [
@@ -78,15 +80,17 @@ function generateParticles(count = 40): Particle[] {
     id: i,
     x: 40 + Math.random() * 20, // near center-top
     y: 0,
+    xOffset: (Math.random() - 0.5) * 30,
     angle: Math.random() * 360,
     color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
     size: 6 + Math.random() * 6,
     duration: 1.2 + Math.random() * 0.8,
+    isCircle: Math.random() > 0.5,
   }));
 }
 
 function Confetti() {
-  const particles = useRef(generateParticles()).current;
+  const [particles] = useState(generateParticles);
 
   return (
     <div
@@ -99,7 +103,7 @@ function Confetti() {
           initial={{ x: `${p.x}vw`, y: -10, opacity: 1, rotate: 0 }}
           animate={{
             y: "100vh",
-            x: `${p.x + (Math.random() - 0.5) * 30}vw`,
+            x: `${p.x + p.xOffset}vw`,
             opacity: [1, 1, 0],
             rotate: p.angle,
           }}
@@ -108,7 +112,7 @@ function Confetti() {
             position: "absolute",
             width: p.size,
             height: p.size,
-            borderRadius: Math.random() > 0.5 ? "50%" : 2,
+            borderRadius: p.isCircle ? "50%" : 2,
             backgroundColor: p.color,
           }}
         />
