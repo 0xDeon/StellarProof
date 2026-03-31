@@ -1,10 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, type ComponentType, type CSSProperties } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamic import for react-json-view to avoid SSR issues
-const ReactJson = dynamic(() => import('react-json-view'), { ssr: false });
+type ReactJsonTheme = string;
+
+interface ReactJsonViewProps {
+  src: Record<string, unknown>;
+  theme?: ReactJsonTheme;
+  collapsed?: number;
+  displayDataTypes?: boolean;
+  name?: string | false;
+  style?: CSSProperties;
+}
+
+const ReactJson = dynamic<ReactJsonViewProps>(
+  () =>
+    import('react-json-view').then(
+      (mod) => mod.default as unknown as ComponentType<ReactJsonViewProps>
+    ),
+  { ssr: false }
+);
 
 type LogCategory = 'wallet' | 'contract' | 'wizard' | 'system';
 
@@ -13,13 +29,25 @@ interface LogEvent {
   timestamp: Date;
   category: LogCategory;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export const DebugPanel: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [logs, setLogs] = useState<LogEvent[]>([]);
+  const [logs, setLogs] = useState<LogEvent[]>(() => {
+    if (process.env.NODE_ENV === 'production') return [];
+    return [
+      { id: '1', timestamp: new Date(), category: 'system', message: 'Debug Panel Initialized' },
+      {
+        id: '2',
+        timestamp: new Date(),
+        category: 'contract',
+        message: 'Mock Contract Response',
+        data: { status: 'success', hash: '0x123...', xdr: 'AAAAAQAAAA...' },
+      },
+    ];
+  });
   const [filter, setFilter] = useState<LogCategory | 'all'>('all');
 
   useEffect(() => {
@@ -36,16 +64,6 @@ export const DebugPanel: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Mock initial logs for development display purposes
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    
-    setLogs([
-      { id: '1', timestamp: new Date(), category: 'system', message: 'Debug Panel Initialized' },
-      { id: '2', timestamp: new Date(), category: 'contract', message: 'Mock Contract Response', data: { status: 'success', hash: '0x123...', xdr: 'AAAAAQAAAA...' } }
-    ]);
   }, []);
 
   if (process.env.NODE_ENV === 'production') {
@@ -88,7 +106,18 @@ export const DebugPanel: React.FC = () => {
       <div className="flex items-center justify-between p-2 border-b border-gray-800 bg-gray-900/50">
         <select 
           value={filter} 
-          onChange={(e) => setFilter(e.target.value as any)}
+          onChange={(e) => {
+            const next = e.target.value;
+            if (
+              next === 'all' ||
+              next === 'wallet' ||
+              next === 'contract' ||
+              next === 'wizard' ||
+              next === 'system'
+            ) {
+              setFilter(next);
+            }
+          }}
           className="bg-gray-800 text-gray-200 border border-gray-700 rounded px-2 py-1 outline-none text-xs"
         >
           <option value="all">All Categories</option>
@@ -125,10 +154,10 @@ export const DebugPanel: React.FC = () => {
                 <span className="text-gray-300 ml-1">{log.message}</span>
               </div>
               
-              {log.data && (
+              {log.data !== undefined && typeof log.data === 'object' && log.data !== null && (
                 <div className="p-2 bg-gray-950 overflow-auto max-h-48 text-xs">
                   <ReactJson 
-                    src={log.data} 
+                    src={log.data as Record<string, unknown>} 
                     theme="twilight"
                     collapsed={1} 
                     displayDataTypes={false}
