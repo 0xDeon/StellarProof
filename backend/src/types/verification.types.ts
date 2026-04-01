@@ -131,7 +131,6 @@ export interface UpdateVerificationStatusDTO {
   /** Stellar transaction hash – supplied when entering `minting` or `completed`. */
   stellarTransactionHash?: string;
 }
-
 /** Standard JSON envelope returned by every endpoint. */
 export interface ApiResponse<T = unknown> {
   success: boolean;

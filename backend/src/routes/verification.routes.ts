@@ -1,39 +1,20 @@
-/**
- * Verification Routes – request validation schemas and route definitions.
- *
- * Endpoints:
- *   POST   /api/v1/verification/jobs              – create a new job
- *   GET    /api/v1/verification/jobs?ownerPublicKey=G...  – list jobs by owner
- *   GET    /api/v1/verification/jobs/:id           – get a single job
- *   PATCH  /api/v1/verification/jobs/:id/status    – advance job state
- *
- * All Zod schemas are co-located with the routes that use them.
- */
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
+import { StatusCodes } from "http-status-codes";
+
 import { verificationController } from "../controllers/verification.controller";
 import { validateBody, validateParams } from "../middleware/validate";
 import { VerificationStatus } from "../types/verification.types";
-import type { Request, Response, NextFunction } from "express";
-import { StatusCodes } from "http-status-codes";
 
-// ---------------------------------------------------------------------------
-// Validation patterns
-// ---------------------------------------------------------------------------
 const STELLAR_PUBLIC_KEY_REGEX = /^G[A-Z2-7]{55}$/;
 const SHA256_HEX_REGEX = /^[a-fA-F0-9]{64}$/;
 const MONGO_OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
 const URL_REGEX = /^https?:\/\/.+/;
 
-// All valid status values as a Zod tuple (required for z.enum)
 const STATUS_VALUES = Object.values(VerificationStatus) as [
   VerificationStatus,
   ...VerificationStatus[]
 ];
-
-// ---------------------------------------------------------------------------
-// Zod schemas
-// ---------------------------------------------------------------------------
 
 const createJobSchema = z.object({
   ownerPublicKey: z
@@ -49,9 +30,7 @@ const createJobSchema = z.object({
 });
 
 const jobIdParamsSchema = z.object({
-  id: z
-    .string()
-    .regex(MONGO_OBJECT_ID_REGEX, "id must be a valid MongoDB ObjectId"),
+  id: z.string().regex(MONGO_OBJECT_ID_REGEX, "id must be a valid MongoDB ObjectId"),
 });
 
 const ownerPublicKeyQuerySchema = z.object({
@@ -125,15 +104,7 @@ const updateStatusSchema = z
     }
   });
 
-// ---------------------------------------------------------------------------
-// Query validation middleware (ownerPublicKey)
-// ---------------------------------------------------------------------------
-
-function validateOwnerQuery(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+function validateOwnerQuery(req: Request, res: Response, next: NextFunction): void {
   const result = ownerPublicKeyQuerySchema.safeParse(req.query);
   if (!result.success) {
     res.status(StatusCodes.BAD_REQUEST).json({
@@ -146,46 +117,26 @@ function validateOwnerQuery(
   next();
 }
 
-// ---------------------------------------------------------------------------
-// Router
-// ---------------------------------------------------------------------------
-
 const router = Router();
 
-/**
- * POST /api/v1/verification/jobs
- * Creates a new VerificationJob in the `pending` state.
- */
 router.post(
   "/",
   validateBody(createJobSchema),
   verificationController.createJob.bind(verificationController)
 );
 
-/**
- * GET /api/v1/verification/jobs?ownerPublicKey=G...
- * Lists all VerificationJobs for the given owner, newest-first.
- */
 router.get(
   "/",
   validateOwnerQuery,
   verificationController.listJobsByOwner.bind(verificationController)
 );
 
-/**
- * GET /api/v1/verification/jobs/:id
- * Retrieves a single VerificationJob by its MongoDB ObjectId.
- */
 router.get(
   "/:id",
   validateParams(jobIdParamsSchema),
   verificationController.getJob.bind(verificationController)
 );
 
-/**
- * PATCH /api/v1/verification/jobs/:id/status
- * Advances the job to the requested status, enforcing state machine rules.
- */
 router.patch(
   "/:id/status",
   validateParams(jobIdParamsSchema),

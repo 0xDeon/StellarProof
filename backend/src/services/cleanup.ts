@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Asset, { IAsset } from '../models/Asset.model';
-import VerificationJob from '../models/VerificationJob.model';
+import { VerificationJobModel } from '../models/verificationJob.model';
 import { cloudinary } from '../config/cloudinary';
 import { CleanedAsset, CleanupResult } from '../types/cleanup';
 import { logger } from '../utils/logger';
@@ -32,7 +32,7 @@ export class CleanupService {
    * These assets are "linked" and must NOT be deleted.
    */
   private async getLinkedAssetIds(): Promise<mongoose.Types.ObjectId[]> {
-    const jobs = await VerificationJob.distinct('assetId').exec();
+    const jobs = await VerificationJobModel.distinct('assetId').exec();
     return jobs as mongoose.Types.ObjectId[];
   }
 
