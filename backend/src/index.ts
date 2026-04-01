@@ -1,39 +1,49 @@
-import { createApp } from "./app";
-import { connectDatabase, disconnectDatabase } from "./config/database";
-import { env } from "./config/env";
-import { startVerificationTimeoutJob } from "./jobs/verificationTimeout.job";
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './config/db';
+import healthRoutes from './routes/health.routes';
+import mongoose from 'mongoose';
+import { initCloudinary } from './config/cloudinary';
+import { startCleanupJob } from './jobs/cleanup.job';
+import { startVerificationTimeoutJob } from './jobs/verificationTimeout.job';
+import v1Routes from './routes/v1';
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 
-async function main(): Promise<void> {
-  await connectDatabase();
+// Load environment variables
+dotenv.config();
 
-  startVerificationTimeoutJob();
+const app = express();
+const PORT = process.env.PORT || 4000;
 
-  const app = createApp();
-  const server = app.listen(env.PORT, () => {
-    console.log(
-      `[Server] StellarProof backend listening on port ${env.PORT} (${env.NODE_ENV})`
-    );
-  });
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-  const shutdown = async (signal: string): Promise<void> => {
-    console.log(`[Server] ${signal} received — shutting down gracefully`);
-    server.close(async () => {
-      await disconnectDatabase();
-      console.log("[Server] HTTP server closed");
-      process.exit(0);
-    });
+// Connect to MongoDB
+connectDB();
 
-    setTimeout(() => {
-      console.error("[Server] Forced shutdown after timeout");
-      process.exit(1);
-    }, 10_000).unref();
-  };
+// Start cron jobs
+startVerificationTimeoutJob();
 
-  process.on("SIGTERM", () => void shutdown("SIGTERM"));
-  process.on("SIGINT", () => void shutdown("SIGINT"));
-}
+// Routes
+app.use('/api/health', healthRoutes);
+app.use('/api/v1', v1Routes);
 
-main().catch((err: unknown) => {
-  console.error("[Server] Fatal startup error:", err);
-  process.exit(1);
+// Base route
+app.get('/', (req: Request, res: Response) => {
+  res.send('StellarProof Backend API is running');
+});
+
+initCloudinary();
+// Start the cron job. It will fire on the CLEANUP_CRON_SCHEDULE interval.
+startCleanupJob();
+
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
