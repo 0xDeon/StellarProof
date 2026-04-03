@@ -184,7 +184,7 @@ export default function Header() {
                         className="absolute left-0 top-full pt-1"
                       >
                         <li className="rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-darkblue/95 shadow-lg backdrop-blur-md">
-                          <ul className="min-w-[160px] py-1">
+                          <ul className="min-w-40 py-1">
                             {item.children.map((child) => (
                               <li key={child.href} role="none">
                                 <a
