@@ -8,6 +8,7 @@ import spvRoutes from "./spv.routes";
 import verificationRoutes from "./verification.routes";
 import manifestRoutes from "./manifest.routes";
 import developerRoutes from "./developer.routes";
+import authRoutes from "./auth.routes";
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use("/api/v1/manifests", manifestRoutes);
 router.use("/api/v1/spv/records", spvRoutes);
 router.use("/api/v1/verification/jobs", verificationRoutes);
 router.use("/api/v1/developer", developerRoutes);
+router.use("/api/v1/auth", authRoutes);
 
 export default router;

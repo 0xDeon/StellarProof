@@ -49,4 +49,10 @@ export const env = {
 
   /** Morgan log format: 'dev' | 'combined' | 'tiny' etc. */
   LOG_LEVEL: optionalEnv("LOG_LEVEL", "dev"),
+
+  /** Secret used to sign and verify JWTs */
+  JWT_SECRET: requireEnv("JWT_SECRET"),
+
+  /** JWT expiry duration, e.g. '7d', '24h' */
+  JWT_EXPIRES_IN: optionalEnv("JWT_EXPIRES_IN", "7d"),
 } as const;
