@@ -12,7 +12,7 @@ export interface IAsset extends Document {
   sizeBytes: number;
   
   // Storage layer details
-  storageProvider: 'mongodb' | 'ipfs' | 's3';
+  storageProvider: 'mongodb' | 'ipfs' | 's3' | 'cloudinary';
   storageReferenceId: string; // CID for IPFS, Object ID for MongoDB, etc.
   
   // Encryption details (StellarProof KMS)
@@ -46,7 +46,7 @@ const AssetSchema: Schema = new Schema(
     },
     storageProvider: {
       type: String,
-      enum: ['mongodb', 'ipfs', 's3'],
+      enum: ['mongodb', 'ipfs', 's3', 'cloudinary'],
       required: true,
       default: 'mongodb',
     },
