@@ -40,7 +40,6 @@ export const uploadEncryptedAsset = async (req: Request, res: Response): Promise
       ? storageProvider
       : 'cloudinary';
 
-  // allowedUsers may arrive as a single string or repeated form fields
   const rawAllowedUsers: string | string[] | undefined = req.body.allowedUsers;
   const allowedUsersArray: string[] = Array.isArray(rawAllowedUsers)
     ? rawAllowedUsers

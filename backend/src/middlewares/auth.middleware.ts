@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { authService } from '../services/auth.service';
+import { AppError } from '../errors/AppError';
 
 export const protect = async (
   req: Request,
@@ -48,8 +49,8 @@ export const protect = async (
       return;
     }
 
-    if (error instanceof Error) {
-      if (error.message === 'USER_NOT_FOUND') {
+    if (error instanceof AppError) {
+      if (error.code === 'USER_NOT_FOUND') {
         res.status(401).json({
           success: false,
           message: 'The user associated with this token no longer exists.',
@@ -57,7 +58,7 @@ export const protect = async (
         return;
       }
 
-      if (error.message === 'ACCOUNT_DEACTIVATED') {
+      if (error.code === 'ACCOUNT_DEACTIVATED') {
         res.status(403).json({
           success: false,
           message: 'This account has been deactivated.',
