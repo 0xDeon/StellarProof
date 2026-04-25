@@ -20,7 +20,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     const storedAuth = localStorage.getItem("stellarproof_auth");
@@ -35,7 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to parse auth from localStorage", e);
       }
     }
-    setIsHydrated(true);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
@@ -82,9 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem("stellarproof_auth");
   };
-
-  // Prevent rendering children until hydrated to avoid hydration mismatch
-  if (!isHydrated) return null;
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout }}>
